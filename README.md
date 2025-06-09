@@ -4,10 +4,10 @@ Eating philosophers problem solution with C++
 
 1. Uruchomienie:
 
-     W celu poprawnego uruchomienia, należy w konsoli, tuż po nazwie pliku, podać dokładnie jeden argument, oznaczający
-     pożądaną liczbą filozofów.
+   Aby zapewnić poprawne uruchomienie, należy w konsoli, tuż po nazwie pliku, podać dokładnie jeden argument
+   będący liczbą całkowitą, oznaczający pożądaną liczbą filozofów.
 
-2. Wątki:
+3. Wątki:
 
     Liczba wątków jest zmienna, równa wartości przekazanej jako argument podczas uruchomienia programu, jako że
     każdemu symulowanemu filozofowi odpowiada dokładnie jeden wątek.
