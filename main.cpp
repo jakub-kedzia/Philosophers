@@ -6,53 +6,48 @@
 #include <chrono>
 #include <random>
 
-// Stany filozofów
 enum State { THINKING, HUNGRY, EATING };
 
-// Zmienne globalne
 std::vector<State> states;
 std::mutex mtx;
+std::mutex cout_mtx;
 std::condition_variable cv;
 
-// Liczba filozofów (ustalana na początku)
 int N = 5;
 
 void print_state(int id, const std::string& message) {
-    std::unique_lock<std::mutex> lock(mtx);
-    std::cout << "Filozof " << id << ": " << message << std::endl;
+    std::unique_lock<std::mutex> lock(cout_mtx);
+    std::cout << "Philosopher " << id << ": " << message << std::endl;
 }
 
-// Sprawdza czy filozof może jeść
 void try_to_eat(int id) {
     if (states[id] == HUNGRY &&
         states[(id + N - 1) % N] != EATING &&
         states[(id + 1) % N] != EATING) {
         states[id] = EATING;
-        cv.notify_all();  // notify others that state has changed
+        cv.notify_all();
     }
 }
 
 void take_forks(int id) {
     std::unique_lock<std::mutex> lock(mtx);
     states[id] = HUNGRY;
-    lock.unlock();
-    print_state(id, "jest glodny i probuje wziac widelce");
+//    lock.unlock();
+    print_state(id, "hungry and tries to take a fork");
 
+//    lock.lock();
     if (states[id] != EATING) {
         try_to_eat(id);
-
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        // Czekaj aż będzie można jeść
-//        cv.wait(lock, [&]() { return states[id] == EATING; });
     }
-    print_state(id, "zaczal jesc");
+//    lock.unlock();
+    print_state(id, "started eating");
 }
 
 void put_forks(int id) {
     std::unique_lock<std::mutex> lock(mtx);
     states[id] = THINKING;
-    mtx.unlock();
-    print_state(id, "odklada widelce i zaczyna mysleć");
+//    lock.unlock();
+    print_state(id, "puts fork down and starts thinking");
 }
 
 void philosopher(int id) {
@@ -61,7 +56,7 @@ void philosopher(int id) {
     std::uniform_int_distribution<> dist(1000, 3000);
 
     while (true) {
-        print_state(id, "mysli");
+        print_state(id, "is thinking");
         std::this_thread::sleep_for(std::chrono::milliseconds(dist(gen)));
 
 
@@ -80,7 +75,7 @@ int main(int argc, char* argv[]) {
     }
 
     N = std::stoi(argv[1]);
-    states.resize(N, THINKING);  // initialize all to THINKING
+    states.resize(N, THINKING);
 
     std::vector<std::thread> philosophers;
     for (int i = 0; i < N; ++i) {
